@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sentence">  
+  <select id="readSentence">
+    SELECT
+    SQL_CALC_FOUND_ROWS
+    M.id,M.seq,M.ContentSubUnit_code,M.ContentSettingTense_code,M.ContentSettingSentencePattern_code,M.sentence_text,M.roman_sentence_text,M.sentence_subject,M.sentence_verb,M.sentence_direct_object,M.sentence_indirect_object,M.sentence_complement,M.sentence_adverb,M.sentence_etc,M.dependent_clause_yn,M.sentence_voice_filename,M.delete_yn,
+    ContentSubUnitDetail.name AS ContentSubUnit_name,
+    ContentUnitMaster.code AS ContentUnit_code,
+    ContentUnitDetail.name AS ContentUnit_name,
+    ContentChapterMaster.code AS ContentChapter_code,
+    ContentStageMaster.code AS ContentStage_code,
+    ContentCourseMaster.code AS ContentCourse_code,
+    ContentCourseMaster.ContentCourseGroup_code AS ContentCourseGroup_code,
+    O.seq AS seq_origin,O.ContentSubUnit_code AS ContentSubUnit_code_origin,O.ContentSettingTense_code AS ContentSettingTense_code_origin,O.ContentSettingSentencePattern_code AS ContentSettingSentencePattern_code_origin,O.sentence_text AS sentence_text_origin,O.roman_sentence_text AS roman_sentence_text_origin,O.sentence_subject AS sentence_subject_origin,O.sentence_verb AS sentence_verb_origin,O.sentence_direct_object AS sentence_direct_object_origin,O.sentence_indirect_object AS sentence_indirect_object_origin,O.sentence_complement AS sentence_complement_origin,O.sentence_adverb AS sentence_adverb_origin,O.sentence_etc AS sentence_etc_origin,O.dependent_clause_yn AS dependent_clause_yn_origin,O.sentence_voice_filename AS sentence_voice_filename_origin,
+    temp.sentenceStatus AS sentenceStatus
+    FROM
+    (((((((((ContentSentenceEditMaster AS M
+    LEFT JOIN ContentSubUnitMaster ON ContentSubUnitMaster.code=M.ContentSubUnit_code)
+    LEFT JOIN ContentSubUnitDetail ON ContentSubUnitDetail.code=M.ContentSubUnit_code AND ContentSubUnitDetail.SystemSettingLanguage_code="L0010")
+    LEFT JOIN ContentUnitMaster ON ContentUnitMaster.code=ContentSubUnitMaster.ContentUnit_code)
+    LEFT JOIN ContentUnitDetail ON ContentUnitDetail.code=ContentUnitMaster.code AND ContentUnitDetail.SystemSettingLanguage_code="L0010")
+    LEFT JOIN ContentChapterMaster ON ContentChapterMaster.code=ContentUnitMaster.ContentChapter_code)
+    LEFT JOIN ContentStageMaster ON ContentStageMaster.code=ContentChapterMaster.ContentStage_code)
+    LEFT JOIN ContentCourseMaster ON ContentCourseMaster.code=ContentStageMaster.ContentCourse_code)
+    LEFT JOIN ContentSentenceMaster AS O ON O.id=M.id)
+    LEFT JOIN (SELECT id, CASE WHEN COUNT(*)=1 THEN "N" ELSE "Y" END AS sentenceStatus FROM
+         (SELECT id,seq,ContentSubUnit_code,ContentSettingTense_code,ContentSettingSentencePattern_code,sentence_text,roman_sentence_text,sentence_subject,sentence_verb,sentence_direct_object,sentence_indirect_object,sentence_complement,sentence_adverb,sentence_etc,dependent_clause_yn,sentence_voice_filename,delete_yn 
+            FROM ContentSentenceEditMaster
+         UNION SELECT id,seq,ContentSubUnit_code,ContentSettingTense_code,ContentSettingSentencePattern_code,sentence_text,roman_sentence_text,sentence_subject,sentence_verb,sentence_direct_object,sentence_indirect_object,sentence_complement,sentence_adverb,sentence_etc,dependent_clause_yn,sentence_voice_filename,delete_yn 
+            FROM ContentSentenceMaster) AS tmp GROUP BY id) AS temp
+         ON temp.id=M.id)
+    <where>
+        M.delete_yn="N"
+        <if test='group != "all"'>AND ContentCourseGroup_code=#{group}</if>
+        <if test='course != "all"'>AND ContentCourse_code=#{course}</if>
+        <if test='stage != "all"'>AND ContentStage_code=#{stage}</if>
+        <if test='chapter != "all"'>AND ContentChapter_code=#{chapter}</if>
+        <if test='unit != "all"'>AND ContentUnit_code=#{unit}</if>
+        <if test='subUnit != "all"'>AND ContentSubUnit_code=#{subUnit}</if>
+        <if test='sentenceStatus != "all"'>AND sentenceStatus=#{sentenceStatus}</if>
+        <if test='searchFilter != ""'>AND M.sentence_text REGEXP #{searchFilter}</if>
+    </where>
+    ORDER BY ContentSubUnitMaster.code, M.seq
+    LIMIT ${first}, ${second}
+  </select>
+
+
+
+  <select id="test">
+    SELECT * FROM ContentSentenceEditMaster
+    <where>
+        <if test="ContentSubUnit_code != null">ContentSubUnit_code = #{ContentSubUnit_code}</if>
+        <if test="sentence_text != null">AND sentence_text = #{sentence_text}</if>
+        <if test="sentence_subject != null">AND sentence_subject = #{sentence_subject}</if>
+    </where>
+  </select>
+  <select id="findActiveBlogLike"
+     resultType="Blog">
+  SELECT * FROM BLOG
+  <where>
+    <if test="state !== null">
+         state = #{state}
+    </if>
+    <if test="title !== null">
+        AND title like #{title}
+    </if>
+    <if test="author !== null and author.name != null">
+        AND author_name like #{author.name}
+    </if>
+  </where>
+</select>
+</mapper>

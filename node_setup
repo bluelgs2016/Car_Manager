@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# nodeJS 기본
+npm install express --save
+npm install axios --save
+npm install cookie-parser --save
+npm install cors --save
+npm install dotenv --save
+
+# Mysql DB 사용
+npm install --save mysql2
+npm install --save mybatisMapper
+
+# 로그기록 사용
+npm install --save winston
+npm install --save winston-daily-rotate-file
+npm install --save morgan
+
+# 날짜 라이브러리
+npm install --save dayjs
+
+# 크롤링 사용
+#npm install --save iconv-lite
+#npm install --save cheerio
+
+# 암호화 사용
+#npm install --save bcrypt
+
+

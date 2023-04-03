@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# react 기본
+npm install redux --save
+npm install react-redux --save
+npm install @reduxjs/toolkit --save
+npm install redux-persist --save
+npm install react-router-dom@6 --save
+npm install axios --save
+npm install styled-components --save
+
+# ant디자인 사용
+#npm install --save antd
+#npm install --save @ant-design/icons
+
+# 날짜 라이브러리
+#npm install --save dayjs
